@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum OperationType {
+  START
+  ADD
+  SUB
+  MUL
+  DIV
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  avatarUrl String?
+  createdAt DateTime @default(now())
+
+  calculations Calculation[]
+
+  @@map("users")
+}
+
+model Calculation {
+  id       String  @id @default(uuid())
+  parentId String?
+  rootId   String  // ID dari akar diskusi (angka awal)
+  userId   String?
+
+  operationType OperationType
+  leftValue     Decimal
+  rightValue    Decimal?
+  resultValue   Decimal
+
+  createdAt DateTime @default(now())
+
+  // Relationships
+  parent   Calculation?  @relation("CalculationTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Calculation[] @relation("CalculationTree")
+  user     User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([rootId])
+  @@index([userId])
+  @@map("calculations")
+}
