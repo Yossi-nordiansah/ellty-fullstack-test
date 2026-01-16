@@ -40,7 +40,7 @@ export async function POST(request) {
     // Set HTTP-only cookie
     response.cookies.set('token', token, {
       httpOnly: true,
-      secure: false, // FORCE FALSE for debugging localhost issues
+      secure: true, // FORCE FALSE for debugging localhost issues
       sameSite: 'lax', // Relaxed to lax for better localhost/cross-request stability
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: '/',
